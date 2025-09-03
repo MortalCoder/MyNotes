@@ -1,0 +1,5 @@
+POSTGRES_DB: "notedb"
+POSTGRES_USER: "kuser"
+POSTGRES_PASSWORD: "kpass"
+PORT: 5432
+HOST: "localhost"
