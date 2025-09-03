@@ -8,19 +8,15 @@ import (
 )
 
 func main() {
-	// 1) логгер (как раньше)
 	logger := logs.NewLogger(false)
 
-	// 2) подключение к БД (как у тебя — одной функцией)
 	db, err := PostgresConnection()
 	if err != nil {
 		logger.Fatal(err)
 	}
 
-	// 3) сервис-слой
 	svc := service.NewService(db, logger)
 
-	// 4) роутер и группа /api
 	router := echo.New()
 	api := router.Group("/api")
 
@@ -35,6 +31,5 @@ func main() {
 	// api.POST("/auth/register", svc.Register)
 	// api.POST("/auth/login", svc.Login)
 
-	// 8) стартуем на 8000, как раньше
 	router.Logger.Fatal(router.Start(":8000"))
 }
