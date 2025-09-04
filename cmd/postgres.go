@@ -18,23 +18,19 @@ type DB struct {
 	Host     string `yaml:"HOST"`
 }
 
-// PostgresConnection подключается к базе данных
 func PostgresConnection() (*sql.DB, error) {
 	config := getDBConfig()
 
-	// строка подключения к базе
 	connectionString := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		config.Host, config.Port, config.User, config.Password, config.Name,
 	)
 
-	// Подключаемся к базе
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		return nil, err
 	}
 
-	// Проверка соединения
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
@@ -42,7 +38,6 @@ func PostgresConnection() (*sql.DB, error) {
 	return db, nil
 }
 
-// getDBConfig получает значения из config.yaml
 func getDBConfig() DB {
 	yamlFile, err := os.ReadFile("config.yaml")
 	if err != nil {

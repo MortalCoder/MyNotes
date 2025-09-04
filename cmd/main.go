@@ -15,21 +15,23 @@ func main() {
 		logger.Fatal(err)
 	}
 
+	//defer db.Close()
+
 	svc := service.NewService(db, logger)
 
 	router := echo.New()
+	router.Logger = logger
+
 	api := router.Group("/api")
 
-	//api.GET("/healthz", svc.Health)
+	api.GET("/notes/:id", svc.GetNoteByID)
+	api.POST("/notes", svc.CreateNote)
+	api.PUT("/notes/:id", svc.UpdateNote)
+	api.DELETE("/notes/:id", svc.DeleteNote)
+	api.GET("/notes", svc.ListNotes)
 
-	//api.GET("/notes/:id", svc.GetNoteByID)
-	//api.POST("/notes", svc.CreateNote)
-	//api.PUT("/notes/:id", svc.UpdateNote)
-	//api.DELETE("/notes/:id", svc.DeleteNote)
-	//api.GET("/notes", svc.ListNotes) // ?page, ?limit
-
-	// api.POST("/auth/register", svc.Register)
-	// api.POST("/auth/login", svc.Login)
+	api.POST("/auth/register", svc.Register)
+	api.POST("/auth/login", svc.Login)
 
 	router.Logger.Fatal(router.Start(":8000"))
 }
