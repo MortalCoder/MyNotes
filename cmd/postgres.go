@@ -16,6 +16,10 @@ type DB struct {
 	Password string `yaml:"POSTGRES_PASSWORD"`
 	Port     string `yaml:"PORT"`
 	Host     string `yaml:"HOST"`
+
+	Features struct {
+		Quote bool `yaml:"FEATURES_QUOTE"`
+	}
 }
 
 func PostgresConnection() (*sql.DB, error) {

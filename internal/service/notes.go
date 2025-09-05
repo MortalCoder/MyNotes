@@ -30,6 +30,16 @@ func (s *Service) CreateNote(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, &Response{ErrorMessage: InvalidParams})
 	}
 
+	quote, err := s.fetchQuote()
+	if err == nil && quote != "" {
+		if req.Body != "" {
+			req.Body += "\n\n"
+		}
+		req.Body += "— " + quote
+	} else {
+		s.logger.Warn("qotd skipped due to error")
+	}
+
 	id, err := s.notesRepo.Create(c.Request().Context(), uid, req.Title, req.Body)
 	if err != nil {
 		s.logger.Errorf("notes.Create: %v", err)

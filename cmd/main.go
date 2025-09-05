@@ -5,6 +5,7 @@ import (
 	"mynotes/pkg/logs"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -21,6 +22,20 @@ func main() {
 
 	router := echo.New()
 	router.Logger = logger
+
+	router.Use(middleware.RequestID())
+
+	router.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+
+		Format: `${time_rfc3339} ` +
+			`rid=${id} ` +
+			`remote_ip=${remote_ip} ` +
+			`method=${method} uri=${uri} ` +
+			`status=${status} ` +
+			`latency=${latency_human} ` +
+			`bytes_in=${bytes_in} bytes_out=${bytes_out} ` +
+			`ua="${user_agent}"` + "\n",
+	}))
 
 	api := router.Group("/api")
 
