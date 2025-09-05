@@ -8,17 +8,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type noteReq struct {
-	Title string `json:"title"`
-	Body  string `json:"body"`
-}
-
-type noteResp struct {
-	ID    int64  `json:"id"`
-	Title string `json:"title"`
-	Body  string `json:"body"`
-}
-
 func (s *Service) CreateNote(c echo.Context) error {
 	uid, err := s.userIDFromToken(c)
 	if err != nil {

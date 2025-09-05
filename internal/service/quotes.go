@@ -8,12 +8,6 @@ import (
 	"time"
 )
 
-type qotdResp struct {
-	Quote struct {
-		Body string `json:"body"`
-	} `json:"quote"`
-}
-
 func (s *Service) fetchQuote() (string, error) {
 	client := &http.Client{Timeout: 3 * time.Second}
 	req, _ := http.NewRequest(http.MethodGet, "https://favqs.com/api/qotd", nil)
