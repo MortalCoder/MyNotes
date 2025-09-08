@@ -1,7 +1,7 @@
 package service
 
 import (
-	"encoding/json"
+
 	//"errors"
 	"net/http"
 	"os"
@@ -15,11 +15,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type registerReq struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 type loginReq struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -30,8 +25,8 @@ type authResp struct {
 }
 
 func (s *Service) Register(c echo.Context) error {
-	var req registerReq
-	if err := json.NewDecoder(c.Request().Body).Decode(&req); err != nil {
+	var req loginReq
+	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, &Response{ErrorMessage: InvalidParams})
 	}
 
@@ -46,8 +41,7 @@ func (s *Service) Register(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, &Response{ErrorMessage: InternalServerError})
 	}
 
-	if _, err := s.usersRepo.Create(c.Request().Context(), req.Email, string(hash)); err != nil {
-		// простая проверка на уникальность (23505) — без привязки к конкретному драйверу
+	if err := s.usersRepo.Create(req.Email, string(hash)); err != nil {
 		if dupErr(err) {
 			return c.JSON(http.StatusConflict, &Response{ErrorMessage: "email already exists"})
 		}
@@ -60,7 +54,7 @@ func (s *Service) Register(c echo.Context) error {
 
 func (s *Service) Login(c echo.Context) error {
 	var req loginReq
-	if err := json.NewDecoder(c.Request().Body).Decode(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, &Response{ErrorMessage: InvalidParams})
 	}
 	req.Email = normalizeEmail(req.Email)
@@ -68,7 +62,7 @@ func (s *Service) Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, &Response{ErrorMessage: "email or password is invalid"})
 	}
 
-	u, err := s.usersRepo.ByEmail(c.Request().Context(), req.Email)
+	u, err := s.usersRepo.ByEmail(req.Email)
 	if err != nil {
 		s.logger.Errorf("usersRepo.ByEmail: %v", err)
 		return c.JSON(http.StatusInternalServerError, &Response{ErrorMessage: InternalServerError})
@@ -95,10 +89,9 @@ func (s *Service) signJWT(u *users.User) (string, error) {
 	}
 
 	claims := jwt.MapClaims{
-		"sub":   u.ID,
-		"email": u.Email,
-		"exp":   time.Now().Add(24 * time.Hour).Unix(),
-		"iat":   time.Now().Unix(),
+		"sub": u.ID,
+		"exp": time.Now().Add(24 * time.Hour).Unix(),
+		"iat": time.Now().Unix(),
 	}
 	tok := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return tok.SignedString([]byte(secret))

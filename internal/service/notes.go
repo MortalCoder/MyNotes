@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -15,7 +14,7 @@ func (s *Service) CreateNote(c echo.Context) error {
 	}
 
 	var req noteReq
-	if err := json.NewDecoder(c.Request().Body).Decode(&req); err != nil || req.Title == "" || req.Body == "" {
+	if err := c.Bind(&req); err != nil || req.Title == "" || req.Body == "" {
 		return c.JSON(http.StatusBadRequest, &Response{ErrorMessage: InvalidParams})
 	}
 
@@ -71,7 +70,7 @@ func (s *Service) UpdateNote(c echo.Context) error {
 	}
 
 	var req noteReq
-	if err := json.NewDecoder(c.Request().Body).Decode(&req); err != nil || req.Title == "" || req.Body == "" {
+	if err := c.Bind(&req); err != nil || req.Title == "" || req.Body == "" {
 		return c.JSON(http.StatusBadRequest, &Response{ErrorMessage: InvalidParams})
 	}
 

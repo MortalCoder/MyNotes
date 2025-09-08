@@ -1,15 +1,5 @@
 package service
 
-type Word struct {
-	Title       string `json:"title"`
-	Translation string `json:"translation"`
-}
-
-type Report struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-}
-
 type noteReq struct {
 	Title string `json:"title"`
 	Body  string `json:"body"`
